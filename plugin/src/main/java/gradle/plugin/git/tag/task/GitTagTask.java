@@ -5,9 +5,16 @@ import gradle.plugin.git.tag.util.CommandExecutor;
 import gradle.plugin.git.tag.util.fartory.CommandExecutorSingleton;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GitTagTask extends DefaultTask {
 
+    private static final Logger log = LoggerFactory.getLogger(GitTagTask.class);
     public static final CommandExecutor commandExecutor;
 
     static {
@@ -17,8 +24,8 @@ public class GitTagTask extends DefaultTask {
     public static final String GIT_BRANCH = "git rev-parse --abbrev-ref HEAD";
     public static final String LAST_PUBLISHED_VERSION = "git describe --abbrev=0 --tags";
     public static final String HAS_TAG = "git describe --exact-match --tags HEAD";
-    public static final String TAG = "git tag ";
-    public static final String PUSH_ORIGIN = "git push origin ";
+    public static final String TAG = "tag ";
+    public static final String PUSH_ORIGIN = "push origin ";
     public static final String STATUS = "git status --porcelain";
 
     @TaskAction
@@ -50,37 +57,47 @@ public class GitTagTask extends DefaultTask {
         commandExecutor.executeGitCommand(PUSH_ORIGIN + version);
     }
 
-    private String getCurrentGitBranch(){
-        return commandExecutor.getResultGitCommand(GIT_BRANCH);
+    private String getCurrentGitBranch() {
+        String branch = commandExecutor.getResultGitCommand(GIT_BRANCH);
+        log.info("Current branch: " + branch);
+        return branch;
     }
 
     private String getLastPublishedVersion() {
-        return commandExecutor.getResultGitCommand(LAST_PUBLISHED_VERSION);
+        String lastPublishedV = commandExecutor.getResultGitCommand(LAST_PUBLISHED_VERSION);
+        log.info("Last published version: " + lastPublishedV);
+        return Objects.requireNonNullElse(lastPublishedV, "v0.0");
     }
 
     private String incrementVersion(String version, boolean isMajor) {
-        if(version == null){
+        if (version == null) {
             version = "v0.0";
         }
-        if (!version.startsWith("v")) {
-            throw new IllegalArgumentException("Invalid version format: " + version);
-        }
 
-        String[] components = version.substring(1).split("\\.");
-        if (components.length != 2) {
-            throw new IllegalArgumentException("Invalid version format: " + version);
-        }
+        String versionRegex = "v(\\d+)\\.(\\d+)(?:-(\\w+))?";
 
-        int major = Integer.parseInt(components[0]);
-        int minor = Integer.parseInt(components[1]);
+        Pattern pattern = Pattern.compile(versionRegex);
+        Matcher matcher = pattern.matcher(version);
 
-        if(isMajor){
-            major++;
+        if (matcher.matches()) {
+            int major = Integer.parseInt(matcher.group(1));
+            int minor = Integer.parseInt(matcher.group(2));
+
+            if (isMajor) {
+                major++;
+            } else {
+                minor++;
+            }
+
+            String suffix = matcher.group(3);
+            if (suffix != null) {
+                return "v" + major + "." + minor + "-" + suffix;
+            } else {
+                return "v" + major + "." + minor;
+            }
         } else {
-            minor++;
+            throw new IllegalArgumentException("Invalid version format: " + version);
         }
-
-        return "v" + major + "." + minor;
     }
 
     private boolean hasUncommittedChanges() {

@@ -38,10 +38,10 @@ public class CommandExecutor {
             Process process = Runtime.getRuntime().exec(command);
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-            String branch = reader.readLine();
+            String result = reader.readLine();
             process.waitFor();
 
-            return branch;
+            return result;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return null;
