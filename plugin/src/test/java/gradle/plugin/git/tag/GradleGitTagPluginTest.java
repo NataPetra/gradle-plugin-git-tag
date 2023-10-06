@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * A simple unit test for the 'gradle.plugin.git.tag.greeting' plugin.
  */
-class GradlePluginGitTagPluginTest {
+class GradleGitTagPluginTest {
     @Test void pluginRegistersATask() {
         // Create a test project and apply the plugin
         Project project = ProjectBuilder.builder().build();
-        project.getPlugins().apply("gradle.plugin.git.tag.greeting");
+        project.getPlugins().apply("gradle.plugin.git.tag.gitTask");
 
         // Verify the result
-        assertNotNull(project.getTasks().findByName("greeting"));
+        assertNotNull(project.getTasks().findByName("gitTask"));
     }
 }

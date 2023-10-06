@@ -7,7 +7,7 @@ import org.gradle.api.Plugin;
 /**
  * A simple 'hello world' plugin.
  */
-public class GradlePluginGitTagPlugin implements Plugin<Project> {
+public class GradleGitTagPlugin implements Plugin<Project> {
     public void apply(Project project) {
         // Register a task
         project.getTasks().register("gitTask", GitTagTask.class);

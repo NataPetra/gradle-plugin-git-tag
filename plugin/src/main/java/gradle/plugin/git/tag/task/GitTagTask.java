@@ -16,12 +16,24 @@ public class GitTagTask extends DefaultTask {
 
     public static final String GIT_BRANCH = "git rev-parse --abbrev-ref HEAD";
     public static final String LAST_PUBLISHED_VERSION = "git describe --abbrev=0 --tags";
+    public static final String HAS_TAG = "git describe --exact-match --tags HEAD";
     public static final String TAG = "git tag ";
     public static final String PUSH_ORIGIN = "git push origin ";
+    public static final String STATUS = "git status --porcelain";
 
     @TaskAction
     public void customTaskAction() {
         String branch = getCurrentGitBranch();
+
+        if (hasGitTag()) {
+            getLogger().info("The current state of the project is already assigned a git tag. A new git tag will not be created.");
+            return;
+        }
+
+        if (hasUncommittedChanges()) {
+            getLogger().warn("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
+            return;
+        }
 
         String version;
         if (branch.equals(Branch.DEV.getName()) || branch.equals(Branch.QA.getName())) {
@@ -47,6 +59,9 @@ public class GitTagTask extends DefaultTask {
     }
 
     private String incrementVersion(String version, boolean isMajor) {
+        if(version == null){
+            version = "v0.0";
+        }
         if (!version.startsWith("v")) {
             throw new IllegalArgumentException("Invalid version format: " + version);
         }
@@ -66,6 +81,14 @@ public class GitTagTask extends DefaultTask {
         }
 
         return "v" + major + "." + minor;
+    }
+
+    private boolean hasUncommittedChanges() {
+        return commandExecutor.getResultGitCommand(STATUS) != null;
+    }
+
+    private boolean hasGitTag() {
+        return commandExecutor.getResultGitCommand(HAS_TAG) != null;
     }
 
 }
