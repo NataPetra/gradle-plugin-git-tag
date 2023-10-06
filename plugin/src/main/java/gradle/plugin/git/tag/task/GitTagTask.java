@@ -8,6 +8,7 @@ import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,7 +27,6 @@ public class GitTagTask extends DefaultTask {
     public static final String HAS_TAG = "git describe --exact-match --tags HEAD";
     public static final String TAG = "tag ";
     public static final String PUSH_ORIGIN = "push origin ";
-    public static final String STATUS = "git status --porcelain";
 
     @TaskAction
     public void customTaskAction() {
@@ -101,7 +101,15 @@ public class GitTagTask extends DefaultTask {
     }
 
     private boolean hasUncommittedChanges() {
-        return commandExecutor.getResultGitCommand(STATUS) != null;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "--cached", "--exit-code");
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            return exitCode != 0;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private boolean hasGitTag() {
