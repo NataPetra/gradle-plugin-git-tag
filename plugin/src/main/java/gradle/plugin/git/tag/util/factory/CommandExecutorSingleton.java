@@ -1,10 +1,14 @@
-package gradle.plugin.git.tag.util.faсtory;
+package gradle.plugin.git.tag.util.factory;
 
 import gradle.plugin.git.tag.util.CommandExecutor;
 
 public class CommandExecutorSingleton {
 
-    private volatile static CommandExecutor instance;
+    private CommandExecutorSingleton() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static volatile CommandExecutor instance;
 
     public static CommandExecutor getInstance() {
         if (instance == null) {
