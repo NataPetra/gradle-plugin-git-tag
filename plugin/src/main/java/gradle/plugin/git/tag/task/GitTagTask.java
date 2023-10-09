@@ -2,7 +2,7 @@ package gradle.plugin.git.tag.task;
 
 import gradle.plugin.git.tag.util.Branch;
 import gradle.plugin.git.tag.util.CommandExecutor;
-import gradle.plugin.git.tag.util.fartory.CommandExecutorSingleton;
+import gradle.plugin.git.tag.util.faсtory.CommandExecutorSingleton;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
@@ -102,7 +102,7 @@ public class GitTagTask extends DefaultTask {
 
     private boolean hasUncommittedChanges() {
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "--cached", "--exit-code");
+            ProcessBuilder processBuilder = new ProcessBuilder("git", "diff", "--quiet");
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
             return exitCode != 0;

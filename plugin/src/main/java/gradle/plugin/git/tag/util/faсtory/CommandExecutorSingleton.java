@@ -1,4 +1,4 @@
-package gradle.plugin.git.tag.util.fartory;
+package gradle.plugin.git.tag.util.faсtory;
 
 import gradle.plugin.git.tag.util.CommandExecutor;
 
