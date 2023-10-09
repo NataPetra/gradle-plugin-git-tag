@@ -11,26 +11,40 @@ public class CommandExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(CommandExecutor.class);
 
-    public void executeGitCommand(String command) {
+    public void executeGitCommand(String command, String command2) {
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("git", command);
-            processBuilder.redirectErrorStream(true);
-
-            Process process = processBuilder.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                log.info(line);
-            }
-
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                log.error("Command execution error: {}", command);
-            }
+            ProcessBuilder processBuilder = new ProcessBuilder("git", command, command2);
+            getProcessBuilder(command, processBuilder);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             Thread.currentThread().interrupt();
+        }
+    }
+
+    public void executeGitCommandPush(String command, String command2, String command3) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("git", command, command2, command3);
+            getProcessBuilder(command, processBuilder);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void getProcessBuilder(String command, ProcessBuilder processBuilder) throws IOException, InterruptedException {
+        processBuilder.redirectErrorStream(true);
+
+        Process process = processBuilder.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            log.info(line);
+        }
+
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            log.error("Command execution error: {}", command);
         }
     }
 

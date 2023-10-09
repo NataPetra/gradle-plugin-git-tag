@@ -25,22 +25,20 @@ public class GitTagTask extends DefaultTask {
     public static final String GIT_BRANCH = "git rev-parse --abbrev-ref HEAD";
     public static final String LAST_PUBLISHED_VERSION = "git describe --abbrev=0 --tags";
     public static final String HAS_TAG = "git describe --exact-match --tags HEAD";
-    public static final String TAG = "tag ";
-    public static final String PUSH_ORIGIN = "push origin ";
 
     @TaskAction
     public void customTaskAction() {
         String branch = getCurrentGitBranch();
 
-        if (hasGitTag()) {
-            getLogger().warn("The current state of the project is already assigned a git tag. A new git tag will not be created.");
-            return;
-        }
+//        if (hasGitTag()) {
+//            getLogger().warn("The current state of the project is already assigned a git tag. A new git tag will not be created.");
+//            return;
+//        }
 
-        if (hasUncommittedChanges()) {
-            getLogger().warn("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
-            return;
-        }
+//        if (hasUncommittedChanges()) {
+//            getLogger().warn("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
+//            return;
+//        }
 
         String version;
         if (branch.equals(Branch.DEV.getName()) || branch.equals(Branch.QA.getName())) {
@@ -53,8 +51,8 @@ public class GitTagTask extends DefaultTask {
             version = getLastPublishedVersion() + "-SNAPSHOT";
         }
 
-        commandExecutor.executeGitCommand(TAG + version);
-        commandExecutor.executeGitCommand(PUSH_ORIGIN + version);
+        commandExecutor.executeGitCommand("tag", version);
+        commandExecutor.executeGitCommandPush("push", "origin", version);
     }
 
     private String getCurrentGitBranch() {
