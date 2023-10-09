@@ -2,7 +2,7 @@ package gradle.plugin.git.tag.task;
 
 import gradle.plugin.git.tag.util.Branch;
 import gradle.plugin.git.tag.util.CommandExecutor;
-import gradle.plugin.git.tag.util.faсtory.CommandExecutorSingleton;
+import gradle.plugin.git.tag.util.factory.CommandExecutorSingleton;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
@@ -25,46 +25,49 @@ public class GitTagTask extends DefaultTask {
     public static final String GIT_BRANCH = "git rev-parse --abbrev-ref HEAD";
     public static final String LAST_PUBLISHED_VERSION = "git describe --abbrev=0 --tags";
     public static final String HAS_TAG = "git describe --exact-match --tags HEAD";
+    public static final String TAG = "Tag: {}";
 
     @TaskAction
     public void customTaskAction() {
         String branch = getCurrentGitBranch();
 
-//        if (hasGitTag()) {
-//            getLogger().warn("The current state of the project is already assigned a git tag. A new git tag will not be created.");
-//            return;
-//        }
+        if (hasGitTag()) {
+            getLogger().info("The current state of the project is already assigned a git tag. A new git tag will not be created.");
+            return;
+        }
 
-//        if (hasUncommittedChanges()) {
-//            getLogger().warn("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
-//            return;
-//        }
+        if (hasUncommittedChanges()) {
+            getLogger().info("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
+            return;
+        }
 
         String version;
         if (branch.equals(Branch.DEV.getName()) || branch.equals(Branch.QA.getName())) {
             version = incrementVersion(getLastPublishedVersion(), Boolean.FALSE);
+            log.info(TAG, version);
         } else if (branch.equals(Branch.STAGE.getName())) {
             version = incrementVersion(getLastPublishedVersion(), Boolean.FALSE) + "-rc";
+            log.info(TAG, version);
         } else if (branch.equals(Branch.MASTER.getName())) {
             version = incrementVersion(getLastPublishedVersion(), Boolean.TRUE);
-            log.warn("Tag: {}", version);
+            log.info(TAG, version);
         } else {
             version = getLastPublishedVersion() + "-SNAPSHOT";
         }
 
         commandExecutor.executeGitCommand("tag", version);
-        commandExecutor.executeGitCommandPush("push", "origin", version);
+        commandExecutor.executeGitCommand("push", "origin", version);
     }
 
     private String getCurrentGitBranch() {
         String branch = commandExecutor.getResultGitCommand(GIT_BRANCH);
-        log.warn("Current branch: {}", branch);
+        log.info("Current branch: {}", branch);
         return branch;
     }
 
     private String getLastPublishedVersion() {
         String lastPublishedV = commandExecutor.getResultGitCommand(LAST_PUBLISHED_VERSION);
-        log.warn("Last published version: {}", lastPublishedV);
+        log.info("Last published version: {}", lastPublishedV);
         return Objects.requireNonNullElse(lastPublishedV, "v0.0");
     }
 
