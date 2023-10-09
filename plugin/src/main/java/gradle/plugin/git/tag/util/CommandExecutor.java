@@ -26,10 +26,11 @@ public class CommandExecutor {
 
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                log.error("Command execution error: " + command);
+                log.error("Command execution error: {}", command);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -44,6 +45,7 @@ public class CommandExecutor {
             return result;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
             return null;
         }
     }

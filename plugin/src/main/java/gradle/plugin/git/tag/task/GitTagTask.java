@@ -33,7 +33,7 @@ public class GitTagTask extends DefaultTask {
         String branch = getCurrentGitBranch();
 
         if (hasGitTag()) {
-            getLogger().info("The current state of the project is already assigned a git tag. A new git tag will not be created.");
+            getLogger().warn("The current state of the project is already assigned a git tag. A new git tag will not be created.");
             return;
         }
 
@@ -59,13 +59,13 @@ public class GitTagTask extends DefaultTask {
 
     private String getCurrentGitBranch() {
         String branch = commandExecutor.getResultGitCommand(GIT_BRANCH);
-        log.info("Current branch: " + branch);
+        log.info("Current branch: {}", branch);
         return branch;
     }
 
     private String getLastPublishedVersion() {
         String lastPublishedV = commandExecutor.getResultGitCommand(LAST_PUBLISHED_VERSION);
-        log.info("Last published version: " + lastPublishedV);
+        log.info("Last published version: {}", lastPublishedV);
         return Objects.requireNonNullElse(lastPublishedV, "v0.0");
     }
 
@@ -108,6 +108,7 @@ public class GitTagTask extends DefaultTask {
             return exitCode != 0;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
             return false;
         }
     }
