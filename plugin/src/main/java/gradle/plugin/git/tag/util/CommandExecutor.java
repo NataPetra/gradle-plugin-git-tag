@@ -14,7 +14,20 @@ public class CommandExecutor {
     public void executeGitCommand(String command, String command2) {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("git", command, command2);
-            getProcessBuilder(command, processBuilder);
+            processBuilder.redirectErrorStream(true);
+
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                log.warn(line);
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                log.error("Command execution error: {}", command);
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             Thread.currentThread().interrupt();
@@ -24,27 +37,23 @@ public class CommandExecutor {
     public void executeGitCommandPush(String command, String command2, String command3) {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("git", command, command2, command3);
-            getProcessBuilder(command, processBuilder);
+            processBuilder.redirectErrorStream(true);
+
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                log.warn(line);
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                log.error("Command execution error: {}", command);
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             Thread.currentThread().interrupt();
-        }
-    }
-
-    private void getProcessBuilder(String command, ProcessBuilder processBuilder) throws IOException, InterruptedException {
-        processBuilder.redirectErrorStream(true);
-
-        Process process = processBuilder.start();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            log.info(line);
-        }
-
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-            log.error("Command execution error: {}", command);
         }
     }
 

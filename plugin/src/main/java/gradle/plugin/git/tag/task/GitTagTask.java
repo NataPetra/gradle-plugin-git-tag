@@ -47,6 +47,7 @@ public class GitTagTask extends DefaultTask {
             version = incrementVersion(getLastPublishedVersion(), Boolean.FALSE) + "-rc";
         } else if (branch.equals(Branch.MASTER.getName())) {
             version = incrementVersion(getLastPublishedVersion(), Boolean.TRUE);
+            log.warn("Tag: {}", version);
         } else {
             version = getLastPublishedVersion() + "-SNAPSHOT";
         }
@@ -57,13 +58,13 @@ public class GitTagTask extends DefaultTask {
 
     private String getCurrentGitBranch() {
         String branch = commandExecutor.getResultGitCommand(GIT_BRANCH);
-        log.info("Current branch: {}", branch);
+        log.warn("Current branch: {}", branch);
         return branch;
     }
 
     private String getLastPublishedVersion() {
         String lastPublishedV = commandExecutor.getResultGitCommand(LAST_PUBLISHED_VERSION);
-        log.info("Last published version: {}", lastPublishedV);
+        log.warn("Last published version: {}", lastPublishedV);
         return Objects.requireNonNullElse(lastPublishedV, "v0.0");
     }
 
