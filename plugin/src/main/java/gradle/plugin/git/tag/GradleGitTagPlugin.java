@@ -9,4 +9,5 @@ public class GradleGitTagPlugin implements Plugin<Project> {
         // Register a task
         project.getTasks().register("gitTask", GitTagTask.class);
     }
+
 }
