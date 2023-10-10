@@ -5,6 +5,13 @@
  * For more detailed information on multi-project builds, please refer to https://docs.gradle.org/8.3/userguide/building_swift_projects.html in the Gradle documentation.
  * This project uses @Incubating APIs which are subject to change.
  */
+pluginManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
 
 rootProject.name = "gradle-plugin-git-tag"
 include("plugin")

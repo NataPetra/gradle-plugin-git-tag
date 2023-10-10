@@ -1,6 +1,9 @@
 plugins {
     `java-gradle-plugin`
+    `maven-publish`
 }
+
+version = "1.0"
 
 repositories {
     mavenCentral()

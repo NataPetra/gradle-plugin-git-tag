@@ -15,6 +15,10 @@ import java.util.regex.Pattern;
 
 public class GitTagTask extends DefaultTask {
 
+    public GitTagTask(){
+        this.setGroup("git plugin");
+    }
+
     private static final Logger log = LoggerFactory.getLogger(GitTagTask.class);
     public static final CommandExecutor commandExecutor;
 
@@ -32,12 +36,12 @@ public class GitTagTask extends DefaultTask {
         String branch = getCurrentGitBranch();
 
         if (hasGitTag()) {
-            getLogger().info("The current state of the project is already assigned a git tag. A new git tag will not be created.");
+            getLogger().warn("The current state of the project is already assigned a git tag. A new git tag will not be created.");
             return;
         }
 
         if (hasUncommittedChanges()) {
-            getLogger().info("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
+            getLogger().warn("There are uncommitted changes in the working directory. Build number: " + getLastPublishedVersion() + ".uncommitted.");
             return;
         }
 
