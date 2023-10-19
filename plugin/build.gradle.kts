@@ -48,3 +48,6 @@ tasks.named<Task>("check") {
     // Include functionalTest as part of the check lifecycle
     dependsOn(testing.suites.named("functionalTest"))
 }
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
+}
